@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  silence-bot:
+    container_name: silence-bot
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - SILENCE_BOT_TOKEN=${SILENCE_BOT_TOKEN}
+    restart: unless-stopped
