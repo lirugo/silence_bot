@@ -8,4 +8,5 @@ services:
       dockerfile: Dockerfile
     environment:
       - SILENCE_BOT_TOKEN=${SILENCE_BOT_TOKEN}
+      - BOT_TOKEN=${SILENCE_BOT_TOKEN}
     restart: unless-stopped
