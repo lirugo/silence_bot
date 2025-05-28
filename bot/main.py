@@ -1,6 +1,6 @@
 import os
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
-from handlers import what_is_it, just_silence, back_to_main, start, payment_info, location_info
+from handlers import what_is_it, just_silence, back_to_main, start, payment_info, location_info, show_all_bookings, delete_all
 from book_room import book_room, handle_booking_callback
 from datetime import datetime
 import constants as C
@@ -19,6 +19,8 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(f'^{C.BTN_NOTHING}$'), just_silence))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(f'^{C.BTN_PAYMENT}$'), payment_info))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(f'^{C.BTN_LOCATION}$'), location_info))
+    app.add_handler(CommandHandler("records", show_all_bookings))
+    app.add_handler(CommandHandler("delete_all", delete_all))
 
     app.add_handler(CallbackQueryHandler(handle_booking_callback, pattern="^book"))
 

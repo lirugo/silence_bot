@@ -1,6 +1,7 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 from telegram.ext import ContextTypes
 from keyboard import main_keyboard, info_keyboard
+from booking_storage import get_all_bookings, delete_all_bookings
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
@@ -62,3 +63,27 @@ async def location_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Якщо не знайдеш — просто постій. Він сам знайде тебе."
     )
     await update.message.reply_text(text, parse_mode="Markdown", reply_markup=main_keyboard)
+
+async def show_all_bookings(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    records = get_all_bookings()
+
+    if not records:
+        await update.message.reply_text("Бронювань поки немає 🪷")
+        return
+
+    lines = [
+        f"{i+1}. {date} о {time} — "
+        f"[{username}](tg://user?id={user_id})" if username != 'unknown'
+        else f"{i+1}. {date} о {time} — [без імені](tg://user?id={user_id})"
+        for i, (date, time, user_id, username) in enumerate(records)
+    ]
+    text = "\n".join(lines)
+
+    await update.message.reply_text(
+        f"🗂 Всі бронювання:\n\n{text}",
+        parse_mode="Markdown"
+    )
+
+async def delete_all(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    delete_all_bookings()
+    await update.message.reply_text("🚫 Всі бронювання успішно видалені.")

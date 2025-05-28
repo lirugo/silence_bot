@@ -2,7 +2,10 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import ContextTypes, CallbackQueryHandler
 from datetime import datetime, timedelta
 import constants as C
-from booking_storage import mark_slot_as_booked, is_slot_available
+from booking_storage import mark_slot_as_booked, is_slot_available, get_all_bookings
+
+def chunk_buttons(buttons, n):
+    return [buttons[i:i + n] for i in range(0, len(buttons), n)]
 
 # Step 1: Day choice
 async def book_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -26,14 +29,22 @@ async def handle_booking_callback(update: Update, context: ContextTypes.DEFAULT_
         await show_time_slots(query, date)
     elif query.data == "book:other":
         buttons = []
-        for i in range(6):  # з сьогодні
+
+        for i in range(12):  # 12 днів включно з сьогодні
             day = datetime.now() + timedelta(days=i)
             day_num = day.day
             month_name = C.UKR_MONTHS[day.month]
             label = f"{day_num} {month_name}"
             callback = f"bookdate:{day.strftime('%m-%d')}"
-            buttons.append([InlineKeyboardButton(label, callback_data=callback)])
-        await query.edit_message_text("Оберіть дату:", reply_markup=InlineKeyboardMarkup(buttons))
+            buttons.append(InlineKeyboardButton(label, callback_data=callback))
+
+        # зробити 2 колонки
+        keyboard = chunk_buttons(buttons, 2)
+
+        await query.edit_message_text(
+            "Оберіть дату:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
     elif query.data.startswith("bookdate:"):
         date = query.data.split(":")[1]
         await show_time_slots(query, date)
@@ -57,9 +68,6 @@ async def handle_booking_callback(update: Update, context: ContextTypes.DEFAULT_
         await query.edit_message_text("Помилка: невірний формат callback_data.")
 
 # Step 3: Show time slots
-def chunk_buttons(buttons, n):
-    return [buttons[i:i + n] for i in range(0, len(buttons), n)]
-
 async def show_time_slots(query, date_str):
     times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00",
              "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"]
