@@ -6,7 +6,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      - SILENCE_BOT_TOKEN=${SILENCE_BOT_TOKEN}
-      - BOT_TOKEN=${SILENCE_BOT_TOKEN}
+    env_file:
+      - .env
     restart: unless-stopped
