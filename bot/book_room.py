@@ -2,6 +2,7 @@ from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import ContextTypes, CallbackQueryHandler
 from datetime import datetime, timedelta
 import constants as C
+from booking_storage import mark_slot_as_booked, is_slot_available
 
 # Step 1: Day choice
 async def book_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -42,12 +43,16 @@ async def handle_booking_callback(update: Update, context: ContextTypes.DEFAULT_
             _, datetime_str = parts[0], parts[1] + ":" + parts[2]  # "05-29T09:00"
             if "T" in datetime_str:
                 date, time = datetime_str.split("T")
-            else:
-                date, time = "???", "???"
-            await query.edit_message_text(
-                f"Готово.\nТиша тебе чекатиме {date} о {time}.\n"
-                "Якщо щось зміниться — скажи мені. Але краще не метушитися."
-            )
+
+                user_id = query.from_user.id
+                username = query.from_user.username
+
+                mark_slot_as_booked(date, time, user_id, username)
+
+                await query.edit_message_text(
+                    f"Готово.\nТиша тебе чекатиме {date} о {time}.\n"
+                    "Якщо щось зміниться — скажи мені. Але краще не метушитися."
+                )
     else:
         await query.edit_message_text("Помилка: невірний формат callback_data.")
 
@@ -59,10 +64,36 @@ async def show_time_slots(query, date_str):
     times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00",
              "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"]
 
-    buttons = [InlineKeyboardButton(t, callback_data=f"booktime:{date_str}T{t}") for t in times]
-    keyboard = chunk_buttons(buttons, 4)
+    now = datetime.now()
+    today_str = now.strftime("%m-%d")
 
-    await query.edit_message_text(
-        f"Оберіть час для {date_str}:",
-        reply_markup=InlineKeyboardMarkup(keyboard)
-    )
+    all_buttons = []
+
+    for t in times:
+        # перевіряємо, чи слот вже зайнятий
+        if not is_slot_available(date_str, t):
+            continue
+
+        # перевіряємо чи це сьогодні
+        if date_str == today_str:
+            month, day = map(int, date_str.split("-"))
+            hour, minute = map(int, t.split(":"))
+            slot_time = datetime(now.year, month, day, hour, minute)
+
+            # якщо час вже минув або менше ніж через годину
+            if slot_time <= now or slot_time - now < timedelta(hours=1):
+                continue
+
+        all_buttons.append(InlineKeyboardButton(t, callback_data=f"booktime:{date_str}T{t}"))
+
+    if all_buttons:
+        keyboard = chunk_buttons(all_buttons, 4)
+        await query.edit_message_text(
+            f"Оберіть час для {date_str}:",
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+    else:
+        await query.edit_message_text(
+            f"На {date_str} більше немає вільного часу 🪷\n"
+            "Оберіть іншу дату, будь ласка."
+        )
