@@ -8,7 +8,7 @@ import constants as C
 def main():
     token = os.getenv("SILENCE_BOT_TOKEN")
     if not token:
-        raise ValueError("BOT_TOKEN environment variable is not set")
+        raise ValueError("SILENCE_BOT_TOKEN environment variable is not set")
 
     app = ApplicationBuilder().token(token).build()
 

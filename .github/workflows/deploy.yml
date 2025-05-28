@@ -1,0 +1,28 @@
+name: Deploy Silence Bot
+
+on:
+  push:
+    branches:
+      - main  # або інша гілка для продакшну
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy to remote server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SILENCE_BOT_SERVER_HOST }}
+          username: ${{ secrets.SILENCE_BOT_SERVER_USER }}
+          key: ${{ secrets.SILENCE_BOT_SERVER_SSH_KEY }}
+          script: |
+            cd /apps/silence_bot
+            git pull origin main
+            export SILENCE_BOT_TOKEN=$SILENCE_BOT_TOKEN
+            docker-compose build
+            docker-compose down
+            docker-compose up -d
