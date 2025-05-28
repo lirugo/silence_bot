@@ -1,5 +1,5 @@
 from telegram import ReplyKeyboardMarkup
-import bot.constants as C
+import constants as C
 
 main_keyboard = ReplyKeyboardMarkup([
     [C.BTN_BOOK, C.BTN_PAYMENT],

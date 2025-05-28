@@ -1,7 +1,7 @@
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton, Update
 from telegram.ext import ContextTypes, CallbackQueryHandler
 from datetime import datetime, timedelta
-import bot.constants as C
+import constants as C
 
 # Step 1: Day choice
 async def book_room(update: Update, context: ContextTypes.DEFAULT_TYPE):

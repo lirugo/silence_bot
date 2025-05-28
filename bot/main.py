@@ -1,9 +1,9 @@
 import os
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
-from bot.handlers import *
-from bot.book_room import book_room, handle_booking_callback
+from handlers import what_is_it, just_silence, back_to_main, start, payment_info, location_info
+from book_room import book_room, handle_booking_callback
 from datetime import datetime
-import bot.constants as C
+import constants as C
 
 def main():
     token = os.getenv("SILENCE_BOT_TOKEN")

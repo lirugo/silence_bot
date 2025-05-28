@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, InputMediaPhoto
 from telegram.ext import ContextTypes
-from .keyboard import main_keyboard, info_keyboard
+from keyboard import main_keyboard, info_keyboard
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
