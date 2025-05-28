@@ -52,10 +52,17 @@ async def handle_booking_callback(update: Update, context: ContextTypes.DEFAULT_
         await query.edit_message_text("Помилка: невірний формат callback_data.")
 
 # Step 3: Show time slots
+def chunk_buttons(buttons, n):
+    return [buttons[i:i + n] for i in range(0, len(buttons), n)]
+
 async def show_time_slots(query, date_str):
-    times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"]
-    buttons = [
-        [InlineKeyboardButton(t, callback_data=f"booktime:{date_str}T{t}")]
-        for t in times
-    ]
-    await query.edit_message_text(f"Оберіть час для {date_str}:", reply_markup=InlineKeyboardMarkup(buttons))
+    times = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00",
+             "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"]
+
+    buttons = [InlineKeyboardButton(t, callback_data=f"booktime:{date_str}T{t}") for t in times]
+    keyboard = chunk_buttons(buttons, 4)
+
+    await query.edit_message_text(
+        f"Оберіть час для {date_str}:",
+        reply_markup=InlineKeyboardMarkup(keyboard)
+    )
