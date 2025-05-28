@@ -16,13 +16,6 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = "Обери, що тебе цікавить:"
     await update.message.reply_text(text, reply_markup=main_keyboard)
 
-async def book_room(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = (
-        "Добре. Тобі потрібна тиша.\n"
-        "Обери день:"
-    )
-    await update.message.reply_text(text, reply_markup=day_keyboard)
-
 async def what_is_it(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = (
         "Це маленька кімната,\n"

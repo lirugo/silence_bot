@@ -1,6 +1,7 @@
 import os
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
 from bot.handlers import *
+from bot.book_room import book_room, handle_booking_callback
 from datetime import datetime
 import bot.constants as C
 
@@ -18,6 +19,8 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(f'^{C.BTN_NOTHING}$'), just_silence))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(f'^{C.BTN_PAYMENT}$'), payment_info))
     app.add_handler(MessageHandler(filters.TEXT & filters.Regex(f'^{C.BTN_LOCATION}$'), location_info))
+
+    app.add_handler(CallbackQueryHandler(handle_booking_callback, pattern="^book"))
 
     print(f"🤖 Silence bot is running... [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]")
 
