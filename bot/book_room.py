@@ -38,16 +38,16 @@ async def handle_booking_callback(update: Update, context: ContextTypes.DEFAULT_
         await show_time_slots(query, date)
     elif query.data.startswith("booktime:"):
         parts = query.data.split(":", 2)
-    if len(parts) == 3:
-        _, datetime_str = parts[0], parts[1] + ":" + parts[2]  # "05-29T09:00"
-        if "T" in datetime_str:
-            date, time = datetime_str.split("T")
-        else:
-            date, time = "???", "???"
-        await query.edit_message_text(
-            f"Готово.\nТиша тебе чекатиме {date} о {time}.\n"
-            "Якщо щось зміниться — скажи мені. Але краще не метушитися."
-        )
+        if len(parts) == 3:
+            _, datetime_str = parts[0], parts[1] + ":" + parts[2]  # "05-29T09:00"
+            if "T" in datetime_str:
+                date, time = datetime_str.split("T")
+            else:
+                date, time = "???", "???"
+            await query.edit_message_text(
+                f"Готово.\nТиша тебе чекатиме {date} о {time}.\n"
+                "Якщо щось зміниться — скажи мені. Але краще не метушитися."
+            )
     else:
         await query.edit_message_text("Помилка: невірний формат callback_data.")
 
